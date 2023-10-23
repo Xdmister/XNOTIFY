@@ -15,10 +15,12 @@ import winreg
 import json
 import subprocess
 
-version = "0.3b"
+version = "0.4b"
+latestversion = "nil"
 alerts = False
 consoleHide = True
 nullCounter = 0
+acceptedNotify = 0
 soundName = "nil"
 si = 0
 
@@ -252,8 +254,7 @@ def create_notification(message, title="Notification", timeout=None):
 
 
 
-
-
+actUpdate = 598
 
 
 # api
@@ -267,7 +268,16 @@ def get_public_ip():
 
 def check_notification():
     while True:
-        time.sleep(1)
+        global version
+        global latestversion
+        global actUpdate
+        if latestversion != version:
+            actUpdate += 1
+            if actUpdate == 600:
+                actUpdate = 0
+                create_notification("New update available (" + latestversion + ")", "XNOTIFY", 5)
+        
+        time.sleep(3)
         ip_address = get_public_ip()
 
         if ip_address:
@@ -283,16 +293,20 @@ def check_notification():
     
             if 'status' in response.json():
                 global nullCounter
+                global acceptedNotify
                 nullCounter += 1
                 os.system('cls' if os.name == 'nt' else 'clear')
                 print_large_font("XNOTIFY")
-                global version
-                print("-----------------------------------------------------------")
+                # global version
+  
+                latestversion = response.json()["version"]
+                print("-----------------------------------------------------")
                 print("")
                 print("Author: Xdmister")
                 print("Version: " + version)
                 print("")
-                print("Null Count:" + str(nullCounter))
+                print("Accepted notify:" + str(acceptedNotify))
+                print("Requested with no notify:" + str(nullCounter))
                 print("")
                 print(response.text)
                 # status = response.json()['status']        
@@ -300,18 +314,20 @@ def check_notification():
                 print("Notification creating")
                 if isinstance(response.json(), list):
                     for item in response.json():
+                        acceptedNotify += 1
                         message = item.get('message')
                         title = item.get('title')
                         timestamp = int(item.get('time'))
                         if message and title and timestamp:
                             os.system('cls' if os.name == 'nt' else 'clear')
                             print_large_font("XNOTIFY")
-                            print("-----------------------------------------------------------")
+                            print("-----------------------------------------------------")
                             print("")
                             print("Author: Xdmister")
                             print("Version: " + version)
                             print("")
-                            print("Null Count:" + str(nullCounter))
+                            print("Accepted notify:" + str(acceptedNotify))
+                            print("Requested with no notify:" + str(nullCounter))
                             print("")
                             print(response.text)
                             create_notification(message, title, timestamp)
@@ -380,6 +396,7 @@ def play_sound(sound_file):
         pygame.mixer.init()
         pygame.mixer.music.load(sound_file)
         pygame.mixer.music.play()
+        pygame.mixer.music.set_volume(0.1)
         while pygame.mixer.music.get_busy():
             continue
         
