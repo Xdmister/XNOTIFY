@@ -12,17 +12,28 @@ import pygame
 import time
 import sys
 import winreg
+import json
 
-
+version = "0.3b"
 alerts = False
 consoleHide = True
 nullCounter = 0
+soundName = "nil"
 
 
 # onstart function
 def onStart():
     os.system('cls' if os.name == 'nt' else 'clear')
     print_large_font("XNOTIFY")
+    create_default_json()
+    data = read_json_data()
+    print("")
+    print("Obsah JSON souboru:")
+    print(data)
+    global alerts
+    global soundName
+    alerts = not data["alerts"]
+    soundName = data["soundName"]
 
 
 
@@ -73,15 +84,19 @@ def create_icon():
     icon_path = "C:/Users/Xdmis/Desktop/XNOTIFY/pepeico.png"
     icon.icon = Image.open(icon_path)
 
-
+    def alertsS():
+        alertSwitch()
+        menu()
+        
+    def console():
+        consoleSwitch()
+        menu()
     
     def menu():
-        alertSwitch()
-        consoleSwitch()
         icon.menu = (
-            item('Version 0.2b', lambda icon, item: create_notification("Verze 0.2b", "XNOTIFY", 5)),
-            item('Alerts ' + str(alerts), lambda icon, item: menu()),
-            item('Console ' + str(consoleHide), lambda icon, item: menu()),
+            item('Version ' + version, lambda icon, item: create_notification("Version: " + version, "XNOTIFY", 5)),
+            item('Alerts ' + str(alerts), lambda icon, item: alertsS()),
+            item('Console ' + str(consoleHide), lambda icon, item: console()),
             item('Exit', lambda icon, item: exit()),
             )
         icon.update_menu
@@ -99,6 +114,7 @@ def exit():
 def alertSwitch():
     global alerts
     alerts = not alerts
+    update_json_data("alerts", alerts)
     
 def consoleSwitch():
     global consoleHide
@@ -175,8 +191,8 @@ def create_notification(message, title="Notification", timeout=None):
     root.configure(bg='#323542')
     root.overrideredirect(True)  
 
-    # soundPath = resource_path("sound.mp3")
-    soundPath = "C:/Users/Xdmis/Desktop/XNOTIFY/sound.mp3"
+    # soundPath = resource_path(soundName)
+    soundPath = "C:/Users/Xdmis/Desktop/XNOTIFY/" + soundName
     play_sound(soundPath)
 
     title_label = tk.Label(root, text=title, fg='#E0E6FF', bg='#323542', font=title_font)  # Přidá titulek do notifikace
@@ -240,12 +256,16 @@ def check_notification():
                 nullCounter += 1
                 os.system('cls' if os.name == 'nt' else 'clear')
                 print_large_font("XNOTIFY")
+                global version
                 print("-----------------------------------------------------------")
+                print("")
+                print("Author: Xdmister")
+                print("Version: " + version)
                 print("")
                 print("Null Count:" + str(nullCounter))
                 print("")
                 print(response.text)
-                status = response.json()['status']        
+                # status = response.json()['status']        
             else:
                 print("Notification creating")
                 if isinstance(response.json(), list):
@@ -254,6 +274,16 @@ def check_notification():
                         title = item.get('title')
                         timestamp = int(item.get('time'))
                         if message and title and timestamp:
+                            os.system('cls' if os.name == 'nt' else 'clear')
+                            print_large_font("XNOTIFY")
+                            print("-----------------------------------------------------------")
+                            print("")
+                            print("Author: Xdmister")
+                            print("Version: " + version)
+                            print("")
+                            print("Null Count:" + str(nullCounter))
+                            print("")
+                            print(response.text)
                             create_notification(message, title, timestamp)
                         else:
                             print("Některé klíče chybí v odpovědi API.")
@@ -333,8 +363,8 @@ def create_default_json():
     json_file_path = os.path.join(xnotify_folder_path, 'data.json')
     if not os.path.exists(json_file_path):
         default_data = {
-            'example_key': 'default_value',
-            'another_key': [1, 2, 3, 4, 5]
+            'alerts': True,
+            'soundName': "sound.mp3"
         }
         with open(json_file_path, 'w') as file:
             json.dump(default_data, file, indent=4)
@@ -346,19 +376,23 @@ def read_json_data():
     documents_path = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Documents')
     json_file_path = os.path.join(documents_path, 'XNOTIFY', 'data.json')
     if os.path.exists(json_file_path):
-        with open(json_file_path, 'r') as file:
-            data = json.load(file)
-            return data
+        try:
+            with open(json_file_path, 'r') as file:
+                data = json.load(file)
+                return data
+        except json.JSONDecodeError as e:
+            print(f"Chyba při načítání JSON souboru: {e}")
+            return None
     else:
         print(f"Soubor {json_file_path} neexistuje.")
 
-def update_json_data():
+def update_json_data(key, value):
     documents_path = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Documents')
     json_file_path = os.path.join(documents_path, 'XNOTIFY', 'data.json')
     if os.path.exists(json_file_path):
         with open(json_file_path, 'r') as file:
             data = json.load(file)
-            data['example_key'] = 'updated_value'
+            data[key] = value
         with open(json_file_path, 'w') as file:
             json.dump(data, file, indent=4)
             print("Hodnota proměnné byla úspěšně aktualizována.")
@@ -375,4 +409,5 @@ def update_json_data():
         
 # endFunctions
 onStart()
+time.sleep(20)
 check_notification()
