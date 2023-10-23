@@ -19,6 +19,7 @@ alerts = False
 consoleHide = True
 nullCounter = 0
 soundName = "nil"
+si = 0
 
 
 # onstart function
@@ -91,12 +92,40 @@ def create_icon():
     def console():
         consoleSwitch()
         menu()
+
+    def changeSound():
+        global si
+        global soundName
+        si += 1
+        
+        if si == 0:
+            soundName = "space.mp3"
+            
+        if si == 1:
+            soundName = "bell1.wav"
+            
+        if si == 2:
+            soundName = "elevator.wav"
+            
+        if si == 3:
+            soundName = "gaminglock.wav"
+            
+        if si == 4:
+            soundName = "hint.wav"
+            
+        if si == 5:
+            soundName = "option.wav"
+        if si == 6:
+            si = 0
+        update_json_data("soundName", soundName)
+        menu()
     
     def menu():
         icon.menu = (
             item('Version ' + version, lambda icon, item: create_notification("Version: " + version, "XNOTIFY", 5)),
             item('Alerts ' + str(alerts), lambda icon, item: alertsS()),
             item('Console ' + str(consoleHide), lambda icon, item: console()),
+            item('Sound ' + str(soundName[:-4]), lambda icon, item: changeSound()),
             item('Exit', lambda icon, item: exit()),
             )
         icon.update_menu
@@ -136,7 +165,6 @@ def consoleSwitch():
         if hWnd:
             user32.ShowWindow(hWnd, SW_HIDE)
 # icon
-
 
 
 
@@ -409,5 +437,6 @@ def update_json_data(key, value):
         
 # endFunctions
 onStart()
+
 time.sleep(20)
 check_notification()
