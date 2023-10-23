@@ -13,6 +13,7 @@ import time
 import sys
 import winreg
 import json
+import subprocess
 
 version = "0.3b"
 alerts = False
@@ -28,13 +29,12 @@ def onStart():
     print_large_font("XNOTIFY")
     create_default_json()
     data = read_json_data()
-    print("")
-    print("Obsah JSON souboru:")
-    print(data)
-    global alerts
     global soundName
-    alerts = not data["alerts"]
+    global alerts
     soundName = data["soundName"]
+    icon_thread = threading.Thread(target=create_icon)
+    icon_thread.start()
+    alerts = data["alerts"]
 
 
 
@@ -60,9 +60,7 @@ except Exception as e:
 
 
 
-# data manager
 
-# data manager
 
 
 
@@ -80,9 +78,11 @@ except Exception as e:
 # icon
 def create_icon():
 
+
+    
     icon = pystray.Icon("name")
-    # icon_path = resource_path("pepeico.png")
-    icon_path = "C:/Users/Xdmis/Desktop/XNOTIFY/pepeico.png"
+    icon_path = resource_path("pepeico.png")
+    # icon_path = "C:/Users/Xdmis/Desktop/XNOTIFY/pepeico.png"
     icon.icon = Image.open(icon_path)
 
     def alertsS():
@@ -117,6 +117,7 @@ def create_icon():
             soundName = "option.wav"
         if si == 6:
             si = 0
+        
         update_json_data("soundName", soundName)
         menu()
     
@@ -134,8 +135,7 @@ def create_icon():
     icon.title = "XNOTIFY"
     icon.run()
 
-icon_thread = threading.Thread(target=create_icon)
-icon_thread.start()
+
 
 def exit():
     os._exit(0)
@@ -164,7 +164,9 @@ def consoleSwitch():
         hWnd = kernel32.GetConsoleWindow()
         if hWnd:
             user32.ShowWindow(hWnd, SW_HIDE)
+consoleSwitch()
 # icon
+
 
 
 
@@ -219,8 +221,8 @@ def create_notification(message, title="Notification", timeout=None):
     root.configure(bg='#323542')
     root.overrideredirect(True)  
 
-    # soundPath = resource_path(soundName)
-    soundPath = "C:/Users/Xdmis/Desktop/XNOTIFY/" + soundName
+    soundPath = resource_path(soundName)
+    # soundPath = "C:/Users/Xdmis/Desktop/XNOTIFY/" + soundName
     play_sound(soundPath)
 
     title_label = tk.Label(root, text=title, fg='#E0E6FF', bg='#323542', font=title_font)  # Přidá titulek do notifikace
@@ -437,6 +439,4 @@ def update_json_data(key, value):
         
 # endFunctions
 onStart()
-
-time.sleep(20)
 check_notification()
