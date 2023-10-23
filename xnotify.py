@@ -9,16 +9,17 @@ from PIL import Image
 import threading
 import os
 import pygame
-import tkinter as tk
 import time
-import ctypes
 import sys
 import winreg
 
+
 alerts = False
 consoleHide = True
+nullCounter = 0
 
 
+# onstart function
 def onStart():
     os.system('cls' if os.name == 'nt' else 'clear')
     print_large_font("XNOTIFY")
@@ -45,6 +46,18 @@ except Exception as e:
 
 
 
+
+
+# data manager
+
+# data manager
+
+
+
+
+
+
+
     
 
 
@@ -54,13 +67,10 @@ except Exception as e:
 
 # icon
 def create_icon():
-    # Vytvoření ikony
+
     icon = pystray.Icon("name")
-    current_directory = os.path.dirname(os.path.abspath(__file__))
-    
     # icon_path = resource_path("pepeico.png")
     icon_path = "C:/Users/Xdmis/Desktop/XNOTIFY/pepeico.png"
-    
     icon.icon = Image.open(icon_path)
 
 
@@ -84,7 +94,6 @@ icon_thread = threading.Thread(target=create_icon)
 icon_thread.start()
 
 def exit():
-    print("exiting")
     os._exit(0)
 
 def alertSwitch():
@@ -147,33 +156,28 @@ def fade_out_animation(root, delay, width, x_coordinate):
 def create_notification(message, title="Notification", timeout=None):
     root = tk.Tk()
     root.title("Notification")
-    root.attributes("-alpha", 0)  # Nastaví průhlednost na 0 pro začátek animace
-    root.wm_attributes("-topmost", True)  # Zajišťuje, že okno zůstane nad ostatními okny
+    root.attributes("-alpha", 0)
+    root.wm_attributes("-topmost", True)
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
     taskbar_height = _SCREEN_HEIGHT - screen_height
-    font = tkfont.Font(family='Helvetica', size=11)  # Změna velikosti písma na 11
-    title_font = tkfont.Font(family='Helvetica', size=12, weight='bold')  # Změna velikosti a stylu písma pro titulek
+    font = tkfont.Font(family='Helvetica', size=11)
+    title_font = tkfont.Font(family='Helvetica', size=12, weight='bold')
     text_lines = len(message.split('\n'))
-    max_width = 300  # Maximální šířka notifikačního okna
-    text_width = min(font.measure(line) for line in message.split('\n'))  # Získání šířky textu
-    text_width = min(text_width, max_width)  # Omezení na maximální šířku
-    notification_height = 60 + text_lines * 25  # Nastaví výšku podle délky textu
-    padding = 10  # Upravit podle potřeby
-    initial_x = screen_width - text_width - padding*2 - 5  # Updatuje počáteční x souřadnici
-    initial_y = screen_height - notification_height - taskbar_height - 50  # Updatuje počáteční y souřadnici
+    max_width = 300  
+    text_width = min(font.measure(line) for line in message.split('\n'))
+    text_width = min(text_width, max_width)
+    notification_height = 60 + text_lines * 25
+    padding = 10
+    initial_x = screen_width - text_width - padding*2 - 5  
+    initial_y = screen_height - notification_height - taskbar_height - 50
     root.geometry("{}x{}+{}+{}".format(text_width + padding*2, notification_height, initial_x, initial_y))  
-    root.configure(bg='#323542')  # Nastaví matné skleněné pozadí
-    root.overrideredirect(True)  # odstraní border
+    root.configure(bg='#323542')
+    root.overrideredirect(True)  
 
-
-    current_directory = os.path.dirname(os.path.abspath(__file__))
     # soundPath = resource_path("sound.mp3")
     soundPath = "C:/Users/Xdmis/Desktop/XNOTIFY/sound.mp3"
-    
-    sound_file = soundPath  # Nahraďte cestu k vašemu zvukovému souboru
-    play_sound(sound_file)
-
+    play_sound(soundPath)
 
     title_label = tk.Label(root, text=title, fg='#E0E6FF', bg='#323542', font=title_font)  # Přidá titulek do notifikace
     title_label.pack(anchor='nw', padx=10, pady=10)
@@ -184,13 +188,12 @@ def create_notification(message, title="Notification", timeout=None):
     def on_click(event):
         fade_out_animation(root, 20, root.winfo_width(), root.winfo_x())
 
-    label.bind("<Button-1>", on_click)  # Při kliknutí na notifikaci spustí fade out animaci
+    label.bind("<Button-1>", on_click)
 
     if timeout:
         root.after(timeout * 1000, lambda: fade_out_animation(root, 20, root.winfo_width(), root.winfo_x()))  # Zavře okno po uplynutí timeoutu
-
-    fade_in_animation(root, 10, 0.1)  # Spustí animaci postupného zvýšení průhlednosti
-
+        
+    fade_in_animation(root, 10, 0.1)
     root.mainloop()
 # notify end
 
@@ -215,31 +218,34 @@ def get_public_ip():
         return data['origin']
     else:
         return None
-    
-# Funkce pro kontrolu API
+
 def check_notification():
     while True:
-        time.sleep(1)  # Pauza pro 1 sekundu
-        response = requests.get('https://ipinfo.io')
-        data = response.json()
+        time.sleep(1)
         ip_address = get_public_ip()
 
         if ip_address:
-            # Definování URL API
             url = 'https://xdmister.eu/xcore/api/notify.php'
 
-            # Odeslání požadavku na API s veřejnou IP adresou
+    
             data = {
                 'ip': ip_address,
-                'message': 'Zpráva na testování',
-                'title': 'Notifikace pro test'
             }
             response = requests.post(url, json=data)
 
-            # Zkontrolujte, zda klíč 'status' existuje v JSON odpovědi
-            print(response.text)
+         
+    
             if 'status' in response.json():
-                status = response.json()['status']            
+                global nullCounter
+                nullCounter += 1
+                os.system('cls' if os.name == 'nt' else 'clear')
+                print_large_font("XNOTIFY")
+                print("-----------------------------------------------------------")
+                print("")
+                print("Null Count:" + str(nullCounter))
+                print("")
+                print(response.text)
+                status = response.json()['status']        
             else:
                 print("Notification creating")
                 if isinstance(response.json(), list):
@@ -251,7 +257,6 @@ def check_notification():
                             create_notification(message, title, timestamp)
                         else:
                             print("Některé klíče chybí v odpovědi API.")
-check_notification()
 # api
 
 
@@ -301,11 +306,9 @@ def print_large_font(text):
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
     try:
-        # PyInstaller creates a temp folder and stores path in _MEIPASS
         base_path = sys._MEIPASS
     except Exception:
         base_path = os.path.abspath(".")
-
     return os.path.join(base_path, relative_path)
 
 
@@ -320,4 +323,56 @@ def play_sound(sound_file):
         while pygame.mixer.music.get_busy():
             continue
         
+        
+def create_default_json():
+    documents_path = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Documents')
+    xnotify_folder_path = os.path.join(documents_path, 'XNOTIFY')
+    if not os.path.exists(xnotify_folder_path):
+        os.makedirs(xnotify_folder_path)
+        print(f"Složka {xnotify_folder_path} byla vytvořena.")
+    json_file_path = os.path.join(xnotify_folder_path, 'data.json')
+    if not os.path.exists(json_file_path):
+        default_data = {
+            'example_key': 'default_value',
+            'another_key': [1, 2, 3, 4, 5]
+        }
+        with open(json_file_path, 'w') as file:
+            json.dump(default_data, file, indent=4)
+            print(f"Soubor {json_file_path} byl vytvořen s výchozími hodnotami.")
+    else:
+        print(f"Soubor {json_file_path} již existuje.")
+
+def read_json_data():
+    documents_path = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Documents')
+    json_file_path = os.path.join(documents_path, 'XNOTIFY', 'data.json')
+    if os.path.exists(json_file_path):
+        with open(json_file_path, 'r') as file:
+            data = json.load(file)
+            return data
+    else:
+        print(f"Soubor {json_file_path} neexistuje.")
+
+def update_json_data():
+    documents_path = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Documents')
+    json_file_path = os.path.join(documents_path, 'XNOTIFY', 'data.json')
+    if os.path.exists(json_file_path):
+        with open(json_file_path, 'r') as file:
+            data = json.load(file)
+            data['example_key'] = 'updated_value'
+        with open(json_file_path, 'w') as file:
+            json.dump(data, file, indent=4)
+            print("Hodnota proměnné byla úspěšně aktualizována.")
+    else:
+        print(f"Soubor {json_file_path} neexistuje.")
+        
+        
+        
+        
+        
+        
+        
+        
+        
+# endFunctions
 onStart()
+check_notification()
