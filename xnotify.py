@@ -18,106 +18,35 @@ import winreg
 alerts = False
 consoleHide = True
 
-os.system('cls' if os.name == 'nt' else 'clear')
+
+def onStart():
+    os.system('cls' if os.name == 'nt' else 'clear')
+    print_large_font("XNOTIFY")
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Získání cesty k samotnému skriptu
+# afterstartup setup
 script_path = os.path.abspath(sys.argv[0])
-
-# Otevře klíč registru, který ovládá spouštění po startu
 key = winreg.HKEY_CURRENT_USER
 sub_key = r"Software\Microsoft\Windows\CurrentVersion\Run"
-
-# Vytvoří záznam v registru
 try:
     with winreg.OpenKey(key, sub_key, 0, winreg.KEY_SET_VALUE) as key_handle:
         winreg.SetValueEx(key_handle, "XNOTIFY", 0, winreg.REG_SZ, script_path)
 except Exception as e:
     print(f"Nepodařilo se přidat aplikaci k automatickému spuštění. Chyba: {e}")
+# afterstartup setup
 
 
 
 
-
-def print_large_font(text):
-    characters = {'A': ['  A  ', ' A A ', 'AAAAA', 'A   A', 'A   A'],
-                  'B': ['BBBB ', 'B   B', 'BBBB ', 'B   B', 'BBBB '],
-                  'C': [' CCCC', 'C    ', 'C    ', 'C    ', ' CCCC'],
-                  'D': ['DDD  ', 'D  D ', 'D   D', 'D  D ', 'DDD  '],
-                  'E': ['EEEEE', 'E    ', 'EEEEE', 'E    ', 'EEEEE'],
-                  'F': ['FFFFF', 'F    ', 'FFFFF', 'F    ', 'F    '],
-                  'G': [' GGGG', 'G    ', 'G  GG', 'G   G', ' GGGG'],
-                  'H': ['H   H', 'H   H', 'HHHHH', 'H   H', 'H   H'],
-                  'I': ['IIIII', '  I  ', '  I  ', '  I  ', 'IIIII'],
-                  'J': ['JJJJJ', '   J ', '   J ', 'J  J ', ' JJ  '],
-                  'K': ['K   K', 'K  K ', 'KK   ', 'K  K ', 'K   K'],
-                  'L': ['L    ', 'L    ', 'L    ', 'L    ', 'LLLLL'],
-                  'M': ['M   M', 'MM MM', 'M M M', 'M   M', 'M   M'],
-                  'N': ['N   N', 'NN  N', 'N N N', 'N  NN', 'N   N'],
-                  'O': [' OOO ', 'O   O', 'O   O', 'O   O', ' OOO '],
-                  'P': ['PPPP ', 'P   P', 'PPPP ', 'P    ', 'P    '],
-                  'Q': [' QQQ ', 'Q   Q', 'Q   Q', 'Q  Q ', ' QQ Q'],
-                  'R': ['RRRR ', 'R   R', 'RRRR ', 'R  R ', 'R   R'],
-                  'S': [' SSSS', 'S    ', ' SSS ', '    S', 'SSSS '],
-                  'T': ['TTTTT', '  T  ', '  T  ', '  T  ', '  T  '],
-                  'U': ['U   U', 'U   U', 'U   U', 'U   U', ' UUU '],
-                  'V': ['V   V', 'V   V', 'V   V', ' V V ', '  V  '],
-                  'W': ['W   W', 'W   W', 'W W W', 'WW WW', 'W   W'],
-                  'X': ['X   X', ' X X ', '  X  ', ' X X ', 'X   X'],
-                  'Y': ['Y   Y', ' Y Y ', '  Y  ', '  Y  ', '  Y  '],
-                  'Z': ['ZZZZZ', '    Z', '   Z ', '  Z  ', 'ZZZZZ'],
-                  ' ': ['     ', '     ', '     ', '     ', '     '],
-                  '/': ['    /', '   / ', '  /  ', ' /   ', '/    '],
-                  '|': ['  |  ', '  |  ', '  |  ', '  |  ', '  |  '],
-                  ':': ['     ', '  :  ', '     ', '  :  ', '     ']}
-    for row in range(5):
-        for char in text:
-            if char.upper() in characters:
-                print(characters[char.upper()][row], end='  ')
-            else:
-                print("     ", end='  ')
-        print()
-
-# Výsledek pro text "XNOTIFY"
-print_large_font("kokot")
 
 
 
 
     
 
-def play_sound(sound_file):
-    if alerts:
-        pygame.mixer.init()
-        pygame.mixer.music.load(sound_file)
-        pygame.mixer.music.play()
-        while pygame.mixer.music.get_busy():
-            continue
 
 
 
@@ -328,6 +257,47 @@ check_notification()
 
 
 
+# label
+def print_large_font(text):
+    characters = {'A': ['  A  ', ' A A ', 'AAAAA', 'A   A', 'A   A'],
+                  'B': ['BBBB ', 'B   B', 'BBBB ', 'B   B', 'BBBB '],
+                  'C': [' CCCC', 'C    ', 'C    ', 'C    ', ' CCCC'],
+                  'D': ['DDD  ', 'D  D ', 'D   D', 'D  D ', 'DDD  '],
+                  'E': ['EEEEE', 'E    ', 'EEEEE', 'E    ', 'EEEEE'],
+                  'F': ['FFFFF', 'F    ', 'FFFFF', 'F    ', 'F    '],
+                  'G': [' GGGG', 'G    ', 'G  GG', 'G   G', ' GGGG'],
+                  'H': ['H   H', 'H   H', 'HHHHH', 'H   H', 'H   H'],
+                  'I': ['IIIII', '  I  ', '  I  ', '  I  ', 'IIIII'],
+                  'J': ['JJJJJ', '   J ', '   J ', 'J  J ', ' JJ  '],
+                  'K': ['K   K', 'K  K ', 'KK   ', 'K  K ', 'K   K'],
+                  'L': ['L    ', 'L    ', 'L    ', 'L    ', 'LLLLL'],
+                  'M': ['M   M', 'MM MM', 'M M M', 'M   M', 'M   M'],
+                  'N': ['N   N', 'NN  N', 'N N N', 'N  NN', 'N   N'],
+                  'O': [' OOO ', 'O   O', 'O   O', 'O   O', ' OOO '],
+                  'P': ['PPPP ', 'P   P', 'PPPP ', 'P    ', 'P    '],
+                  'Q': [' QQQ ', 'Q   Q', 'Q   Q', 'Q  Q ', ' QQ Q'],
+                  'R': ['RRRR ', 'R   R', 'RRRR ', 'R  R ', 'R   R'],
+                  'S': [' SSSS', 'S    ', ' SSS ', '    S', 'SSSS '],
+                  'T': ['TTTTT', '  T  ', '  T  ', '  T  ', '  T  '],
+                  'U': ['U   U', 'U   U', 'U   U', 'U   U', ' UUU '],
+                  'V': ['V   V', 'V   V', 'V   V', ' V V ', '  V  '],
+                  'W': ['W   W', 'W   W', 'W W W', 'WW WW', 'W   W'],
+                  'X': ['X   X', ' X X ', '  X  ', ' X X ', 'X   X'],
+                  'Y': ['Y   Y', ' Y Y ', '  Y  ', '  Y  ', '  Y  '],
+                  'Z': ['ZZZZZ', '    Z', '   Z ', '  Z  ', 'ZZZZZ'],
+                  ' ': ['     ', '     ', '     ', '     ', '     '],
+                  '/': ['    /', '   / ', '  /  ', ' /   ', '/    '],
+                  '|': ['  |  ', '  |  ', '  |  ', '  |  ', '  |  '],
+                  ':': ['     ', '  :  ', '     ', '  :  ', '     ']}
+    for row in range(5):
+        for char in text:
+            if char.upper() in characters:
+                print(characters[char.upper()][row], end='  ')
+            else:
+                print("     ", end='  ')
+        print()
+# label
+
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
     try:
@@ -337,3 +307,17 @@ def resource_path(relative_path):
         base_path = os.path.abspath(".")
 
     return os.path.join(base_path, relative_path)
+
+
+
+
+
+def play_sound(sound_file):
+    if alerts:
+        pygame.mixer.init()
+        pygame.mixer.music.load(sound_file)
+        pygame.mixer.music.play()
+        while pygame.mixer.music.get_busy():
+            continue
+        
+onStart()
